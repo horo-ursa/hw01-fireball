@@ -1,12 +1,18 @@
 #version 300 es
+
 precision highp float;
+const vec2 positions[6] = vec2[](
+            vec2(-1.0, -1.0),
+            vec2(1.0, -1.0), 
+            vec2(-1.0, 1.0), 
+            vec2(-1.0, 1.0), 
+            vec2(1.0, -1.0), 
+            vec2(1.0, 1.0)
+        ); 
 
-// The vertex shader used to render the background of the scene
 
-in vec4 vs_Pos;
-out vec2 fs_Pos;
 
-void main() {
-  fs_Pos = vs_Pos.xy;
-  gl_Position = vs_Pos;
+void main()
+{
+    gl_Position = vec4(positions[gl_VertexID], 0.99, 1.0);
 }

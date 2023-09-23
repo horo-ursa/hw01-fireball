@@ -2,7 +2,7 @@ import {mat4, vec4} from 'gl-matrix';
 import Drawable from './Drawable';
 import Camera from '../../Camera';
 import {gl} from '../../globals';
-import ShaderProgram from './ShaderProgram';
+import ShaderProgram, {ShaderData} from './ShaderProgram';
 
 // In this file, `gl` is accessible because it is imported above
 class OpenGLRenderer {
@@ -22,13 +22,27 @@ class OpenGLRenderer {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   }
 
-  render(camera: Camera, prog: ShaderProgram, drawables: Array<Drawable>, time: number) {
-    prog.setEyeRefUp(camera.controls.eye, camera.controls.center, camera.controls.up);
-    prog.setTime(time);
+  render(camera: Camera, prog: ShaderProgram, shaderData : ShaderData, drawables: Array<Drawable>) {
+    let model = shaderData.model;
+    let viewProj = shaderData.viewProj;
+    let color = shaderData.color;
+
+    mat4.identity(model);
+    mat4.multiply(viewProj, camera.projectionMatrix, camera.viewMatrix);
+    prog.setModelMatrix(model);
+    prog.setViewProjMatrix(viewProj);
+    prog.setGeometryColor(color);
+    prog.setTime(shaderData.time);
 
     for (let drawable of drawables) {
       prog.draw(drawable);
     }
+  }
+
+  drawBackground(camera: Camera, prog: ShaderProgram, shaderData : ShaderData) {
+    prog.setTime(shaderData.time);
+    prog.setResolution(shaderData.resolution);
+    prog.drawQuad();
   }
 };
 
